@@ -21,45 +21,57 @@
   --color-app: #ffffff;
   --color-main: #fafafa;
   --color-sidebar: #ffffff;
+
   --color-surface: #ffffff;
   --color-surface-subtle: #fcfcfd;
   --color-surface-muted: #f3f4f6;
   --color-surface-hover: #f9fafb;
   --color-nav-hover: #f7f7f8;
+
   --color-border: #e9eaee;
   --color-border-muted: #ececec;
   --color-border-soft: #f1f1f1;
   --color-border-strong: #e5e7eb;
+
   --color-text: #111827;
   --color-text-muted: #6b7280;
   --color-text-subtle: #9ca3af;
   --color-text-soft: #d1d5db;
-  --color-accent: #facc15;
-  --color-accent-soft: #fef3c7;
-  --color-accent-weak: #fffdf5;
-  --color-accent-strong: #ca8a04;
-  --color-accent-text: #854d0e;
-  --color-accent-border: rgba(250, 204, 21, 0.42);
-  --color-accent-tint: rgba(250, 204, 21, 0.14);
-  --color-accent-tint-strong: rgba(250, 204, 21, 0.16);
+
+  /* Brand accent */
+  --color-accent: #4b88c3;
+  --color-accent-soft: #dcebf8;
+  --color-accent-weak: #f4f8fc;
+  --color-accent-strong: #356a9d;
+  --color-accent-text: #28527a;
+
+  --color-accent-border: rgba(75, 136, 195, 0.36);
+  --color-accent-tint: rgba(75, 136, 195, 0.1);
+  --color-accent-tint-strong: rgba(75, 136, 195, 0.18);
+
   --color-success: #4ade80;
-  --color-focus-ring: rgba(250, 204, 21, 0.5);
-  --color-focus-ring-strong: rgba(250, 204, 21, 0.72);
+
+  --color-focus-ring: rgba(75, 136, 195, 0.48);
+  --color-focus-ring-strong: rgba(75, 136, 195, 0.7);
+
   --color-scrim: rgba(0, 0, 0, 0.45);
   --color-scrollbar: rgba(0, 0, 0, 0.15);
-  --color-video-hover: rgba(17, 24, 39, 0.1);
+
+  --color-video-hover: rgba(75, 136, 195, 0.12);
+
   --color-overlay-surface: rgba(255, 255, 255, 0.03);
   --color-overlay-hover: rgba(255, 255, 255, 0.08);
   --color-overlay-muted: rgba(255, 255, 255, 0.04);
   --color-overlay-border: rgba(255, 255, 255, 0.06);
   --color-overlay-subtle: rgba(255, 255, 255, 0.02);
+
   --color-count-inverse-bg: rgba(0, 0, 0, 0.18);
   --color-count-inverse-text: rgba(255, 255, 255, 0.92);
 
   --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.04);
   --shadow-hover: 0 12px 28px rgba(17, 24, 39, 0.08);
   --shadow-avatar: 0 12px 24px rgba(17, 24, 39, 0.16);
-  --shadow-accent: 0 10px 18px rgba(250, 204, 21, 0.22);
+  --shadow-accent: 0 10px 18px rgba(75, 136, 195, 0.22);
 
   --radius-sm: 12px;
   --radius-md: 14px;
@@ -71,14 +83,16 @@
   --transition-sidebar: transform 0.28s ease;
   --transition-overlay: opacity 0.25s ease;
 
-  /* Backward-compatible aliases while the stylesheet continues to settle. */
+  /* Backward-compatible aliases */
   --bg: var(--color-page);
   --card: var(--color-surface);
   --border: var(--color-border);
   --text: var(--color-text);
   --muted: var(--color-text-muted);
+
   --yellow: var(--color-accent);
   --yellow-soft: var(--color-accent-soft);
+
   --sidebar: var(--color-sidebar);
   --shadow: var(--shadow-card);
   --radius: var(--radius-xl);
@@ -90,29 +104,49 @@ body.dark {
 
   --color-page: #0b0d10;
   --color-app: #111418;
-  --color-main: radial-gradient(circle at top, #13181e 0%, #0d1014 100%);
+
+  --color-main:
+    radial-gradient(
+      circle at top,
+      #13181e 0%,
+      #0d1014 100%
+    );
+
   --color-sidebar: #0f1317;
+
   --color-surface: var(--color-overlay-surface);
   --color-surface-subtle: var(--color-overlay-subtle);
   --color-surface-muted: var(--color-overlay-muted);
   --color-surface-hover: var(--color-overlay-hover);
+
   --color-nav-hover: var(--color-overlay-muted);
+
   --color-border: var(--color-overlay-border);
   --color-border-muted: var(--color-overlay-border);
   --color-border-soft: var(--color-overlay-border);
   --color-border-strong: #e5e7eb;
+
   --color-text: #ffffff;
   --color-text-muted: #9ca3af;
   --color-text-subtle: #9ca3af;
   --color-text-soft: #e5e7eb;
-  --color-accent-soft: var(--color-accent-tint-strong);
-  --color-accent-weak: rgba(250, 204, 21, 0.04);
-  --color-accent-text: #fde68a;
-  --color-accent-border: rgba(250, 204, 21, 0.24);
-  --color-scrollbar: rgba(255, 255, 255, 0.12);
-  --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.24);
-}
 
+  /* Brand accent */
+  --color-accent-soft: rgba(75, 136, 195, 0.16);
+  --color-accent-weak: rgba(75, 136, 195, 0.05);
+  --color-accent-text: #d8ebff;
+  --color-accent-border: rgba(75, 136, 195, 0.28);
+
+  --color-focus-ring: rgba(75, 136, 195, 0.42);
+  --color-focus-ring-strong: rgba(75, 136, 195, 0.68);
+
+  --color-scrollbar: rgba(255, 255, 255, 0.12);
+
+  --color-video-hover: rgba(75, 136, 195, 0.16);
+
+  --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.24);
+  --shadow-accent: 0 10px 24px rgba(75, 136, 195, 0.18);
+}
 
 * {
   margin: 0;
