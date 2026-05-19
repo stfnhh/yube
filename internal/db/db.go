@@ -225,7 +225,7 @@ func (s *Store) UpsertFeed(
 	return err
 }
 
-func (s *Store) UpdateFeedIcon(
+func (s *Store) UpdateChannelIcon(
 	ctx context.Context,
 	feedID int64,
 	iconURL string,
@@ -240,7 +240,7 @@ func (s *Store) UpdateFeedIcon(
 	return err
 }
 
-func (s *Store) FeedIconURL(
+func (s *Store) ChannelIconURL(
 	ctx context.Context,
 	channelID string,
 ) (string, error) {

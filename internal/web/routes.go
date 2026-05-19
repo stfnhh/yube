@@ -21,6 +21,8 @@ func (s *Server) Routes() http.Handler {
 
 	r.Get("/", s.index)
 
+	s.rssRoute(r, "/rss.xml")
+
 	r.Get("/search", s.search)
 
 	r.Get("/settings", s.settings)
@@ -40,7 +42,7 @@ func (s *Server) Routes() http.Handler {
 
 		r.Get("/{channelID}", s.index)
 
-		r.Get("/{channelID}/icon", s.feedIcon)
+		r.Get("/{channelID}/icon", s.channelIcon)
 	})
 
 	r.Route("/videos", func(r chi.Router) {

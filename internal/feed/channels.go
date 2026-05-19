@@ -505,7 +505,7 @@ func (r *Refresher) RefreshFeed(
 
 		if iconURL != "" {
 
-			_ = r.Store.UpdateFeedIcon(
+			_ = r.Store.UpdateChannelIcon(
 				ctx,
 				f.ID,
 				iconURL,

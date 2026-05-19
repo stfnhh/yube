@@ -59,15 +59,15 @@
             <header class="settings-card-header">
               <div>
                 <h3>Add channel</h3>
-                <p>Add a channel by URL or subscription feed.</p>
+                <p>Add a channel by URL or Atom source.</p>
               </div>
             </header>
 
             <form class="channel-form channel-action-form" action="/channels" method="post">
               <div class="channel-input-panel">
-                <label class="channel-input-title" for="feed-url">Channel source</label>
-                <span class="channel-input-copy">Paste a channel URL, handle URL, or subscription feed.</span>
-                <input id="feed-url" name="feed_url" placeholder="https://.../@channel" required>
+                <label class="channel-input-title" for="channel-source">Channel source</label>
+                <span class="channel-input-copy">Paste a channel URL, handle URL, or Atom source.</span>
+                <input id="channel-source" name="channel_source" placeholder="https://.../@channel" required>
               </div>
               <button class="primary-btn action-fit-btn" type="submit">Add channel</button>
             </form>

@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func (s *Server) feedIcon(
+func (s *Server) channelIcon(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
@@ -21,7 +21,7 @@ func (s *Server) feedIcon(
 		return
 	}
 
-	iconURL, err := s.Store.FeedIconURL(
+	iconURL, err := s.Store.ChannelIconURL(
 		r.Context(),
 		channelID,
 	)

@@ -57,7 +57,7 @@ func (s *Server) addChannel(
 	}
 
 	rawURL := strings.TrimSpace(
-		r.FormValue("feed_url"),
+		r.FormValue("channel_source"),
 	)
 
 	channel, err := s.Refresher.ResolveChannelInput(
@@ -67,7 +67,7 @@ func (s *Server) addChannel(
 	if err != nil {
 		http.Error(
 			w,
-			"Expected a channel URL or subscription feed URL",
+			"Expected a channel URL or Atom source URL",
 			http.StatusBadRequest,
 		)
 
