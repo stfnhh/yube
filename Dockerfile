@@ -30,8 +30,10 @@ RUN CGO_ENABLED=0 \
     -ldflags="-s -w -buildid=" \
     -o /yube \
     ./cmd/server \
-    && strip /yube \
-    && upx --best --lzma /yube
+    && if [ "${TARGETARCH:-amd64}" = "amd64" ]; then \
+      strip /yube || true; \
+      upx --best --lzma /yube || echo "UPX compression skipped"; \
+    fi
 
 
 FROM scratch
