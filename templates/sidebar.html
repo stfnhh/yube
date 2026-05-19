@@ -1,0 +1,69 @@
+{{ define "sidebar" }}
+    <aside class="sidebar">
+      <header class="logo">
+        <div class="logo-icon">
+          <img src="/static/logo.png" width="30" height="30" alt="" />
+        </div>
+        <h1>TubeHive</h1>
+      </header>
+
+      <nav class="nav" aria-label="Primary">
+        <a class="nav-item{{ if eq .ActiveNav "watch" }} active{{ end }}" href="/"><i class="icon icon-play-circle" aria-hidden="true"></i> Watch</a>
+        <a class="nav-item{{ if eq .ActiveNav "channels" }} active{{ end }}" href="/channels"><i class="icon icon-list" aria-hidden="true"></i> Channels</a>
+        <a class="nav-item{{ if eq .ActiveNav "settings" }} active{{ end }}" href="/settings"><i class="icon icon-cog" aria-hidden="true"></i> Settings</a>
+      </nav>
+
+      <section class="subscriptions-section" aria-labelledby="sidebar-channels-title">
+        <h2 class="section-title" id="sidebar-channels-title">Channels</h2>
+
+        <nav class="subscriptions" aria-label="Channels">
+          {{ range .Channels }}
+            <a
+              class="sub-item{{ if eq $.SelectedChannelID .ChannelID }} active{{ end }}"
+              href="/channels/{{ .ChannelID }}"
+              data-channel-id="{{ .ChannelID }}"
+            >
+              <span class="sub-left">
+                {{ template "channel-avatar" . }}
+
+                <span class="sub-name">
+                  {{ .Title }}
+                </span>
+              </span>
+
+              <span class="sub-count">
+                {{ .UnreadCount }}
+              </span>
+            </a>
+          {{ end }}
+        </nav>
+      </section>
+
+      <a class="show-all" href="/channels">Show all</a>
+
+      <footer class="sidebar-footer">
+        <p class="footer-text">
+          Last updated<br>
+          {{ if .HasLastUpdated }}{{ ago .LastUpdated }}{{ else }}Never{{ end }}
+        </p>
+
+        <div class="status-dot" aria-hidden="true"></div>
+      </footer>
+    </aside>
+{{ end }}
+
+{{ define "channel-avatar" }}
+    <span class="sub-avatar">
+      <span class="sub-avatar-fallback">
+        {{ initial .Title }}
+      </span>
+      {{ if .IconURL }}
+      <img
+        src="/channels/{{ .ChannelID }}/icon"
+        alt="{{ .Title }}"
+        loading="lazy"
+        onerror="this.hidden = true"
+      >
+      {{ end }}
+    </span>
+{{ end }}

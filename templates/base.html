@@ -1,0 +1,34 @@
+{{ define "head" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ if .Title }}{{ .Title }}{{ else }}TubeHive{{ end }}</title>
+  <link href="/static/app.css?v=4" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="app">
+{{ end }}
+
+{{ define "layout-start" }}
+{{ template "head" . }}
+{{ template "mobile-overlay" . }}
+{{ template "sidebar" . }}
+
+    <main class="main">
+{{ template "topbar" . }}
+{{ end }}
+
+{{ define "layout-end" }}
+    </main>
+  </div>
+  <script type="text/javascript" src="/static/app.js?v=9"></script>
+</body>
+</html>
+{{ end }}
+
+{{ define "mobile-overlay" }}
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+{{ end }}

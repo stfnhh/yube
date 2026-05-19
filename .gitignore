@@ -1,0 +1,7 @@
+.gocache
+.tools
+.DS_Store
+data
+*.db-shm
+*.db-wal
+*.db

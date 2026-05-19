@@ -1,0 +1,89 @@
+{{ define "settings.html" }}
+{{ template "layout-start" . }}
+
+      <header class="section-header">
+        <div>
+          <h2>Settings</h2>
+          <p class="page-subtitle">Tune how TubeHive refreshes channels and keeps your library tidy.</p>
+        </div>
+      </header>
+
+      {{ if eq .Message "saved" }}
+      <aside class="notice">
+        Settings saved
+      </aside>
+      {{ end }}
+
+      <form class="settings-panel" action="/settings" method="post">
+        <article class="settings-card">
+          <header class="settings-card-header">
+            <div>
+              <h3>Refresh</h3>
+              <p>Control how often channels are checked in the background.</p>
+            </div>
+          </header>
+
+          <section class="settings-grid" aria-label="Refresh settings">
+            <label class="setting-row">
+              <span>
+                <span class="setting-title">Refresh interval</span>
+                <span class="setting-description">How often to check for new videos.</span>
+              </span>
+
+              <select name="refresh_interval_minutes">
+                <option value="15"{{ if eq .Settings.RefreshIntervalMin 15 }} selected{{ end }}>15 minutes</option>
+                <option value="30"{{ if eq .Settings.RefreshIntervalMin 30 }} selected{{ end }}>30 minutes</option>
+                <option value="60"{{ if eq .Settings.RefreshIntervalMin 60 }} selected{{ end }}>1 hour</option>
+                <option value="180"{{ if eq .Settings.RefreshIntervalMin 180 }} selected{{ end }}>3 hours</option>
+                <option value="360"{{ if eq .Settings.RefreshIntervalMin 360 }} selected{{ end }}>6 hours</option>
+              </select>
+            </label>
+          </section>
+        </article>
+
+        <article class="settings-card">
+          <header class="settings-card-header">
+            <div>
+              <h3>Library</h3>
+              <p>Keep the local database compact while preserving recent videos.</p>
+            </div>
+          </header>
+
+          <section class="settings-grid" aria-label="Library settings">
+            <label class="setting-row">
+              <span>
+                <span class="setting-title">Video retention</span>
+                <span class="setting-description">Remove videos older than this after refreshes.</span>
+              </span>
+
+              <select name="video_retention_days">
+                <option value="30"{{ if eq .Settings.VideoRetentionDays 30 }} selected{{ end }}>30 days</option>
+                <option value="90"{{ if eq .Settings.VideoRetentionDays 90 }} selected{{ end }}>90 days</option>
+                <option value="180"{{ if eq .Settings.VideoRetentionDays 180 }} selected{{ end }}>180 days</option>
+                <option value="365"{{ if eq .Settings.VideoRetentionDays 365 }} selected{{ end }}>1 year</option>
+              </select>
+            </label>
+
+            <label class="setting-row">
+              <span>
+                <span class="setting-title">Max videos per channel</span>
+                <span class="setting-description">Keep only the latest videos for each channel.</span>
+              </span>
+
+              <select name="max_videos_per_channel">
+                <option value="100"{{ if eq .Settings.MaxVideosPerChannel 100 }} selected{{ end }}>100</option>
+                <option value="250"{{ if eq .Settings.MaxVideosPerChannel 250 }} selected{{ end }}>250</option>
+                <option value="500"{{ if eq .Settings.MaxVideosPerChannel 500 }} selected{{ end }}>500</option>
+                <option value="1000"{{ if eq .Settings.MaxVideosPerChannel 1000 }} selected{{ end }}>1000</option>
+              </select>
+            </label>
+          </section>
+        </article>
+
+        <footer class="settings-actions">
+          <button class="primary-btn" type="submit">Save settings</button>
+        </footer>
+      </form>
+
+{{ template "layout-end" . }}
+{{ end }}

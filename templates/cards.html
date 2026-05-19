@@ -1,0 +1,120 @@
+{{ define "channel-result-card" }}
+    <a href="/channels/{{ .ChannelID }}" class="video-card-link">
+      <article class="video-card channel-result-card">
+        <figure class="video-figure">
+          <div class="channel-result-hero" aria-label="{{ .Title }}">
+            <div class="channel-result-avatar">
+              <span class="video-avatar-fallback">
+                {{ initial .Title }}
+              </span>
+              {{ if .IconURL }}
+              <img
+                src="/channels/{{ .ChannelID }}/icon"
+                alt="{{ .Title }}"
+                loading="lazy"
+                onerror="this.hidden = true"
+              >
+              {{ end }}
+            </div>
+          </div>
+
+          <figcaption class="video-content">
+            {{ template "video-channel-avatar" . }}
+
+            <div class="video-details">
+              <h3 class="video-title">{{ .Title }}</h3>
+
+              <p class="video-meta">
+                <span class="video-channel">Channel</span>
+                <span class="video-meta-dot">•</span>
+                <span>{{ .UnreadCount }} unwatched</span>
+              </p>
+            </div>
+          </figcaption>
+        </figure>
+      </article>
+    </a>
+{{ end }}
+
+{{ define "video-card" }}
+    <a href="/watch/{{ .VideoID }}" class="video-card-link" target="_blank" rel="noopener noreferrer" data-channel-id="{{ .ChannelID }}" data-watched="{{ .Watched }}">
+      <article class="video-card">
+        <figure class="video-figure">
+          <div class="thumbnail">
+            <img src="/videos/{{ .VideoID }}/thumbnail?v=2" alt="{{ .Title }}" loading="lazy" />
+          </div>
+
+          <figcaption class="video-content">
+            <div class="video-channel-avatar">
+              <span class="video-avatar-fallback">
+                {{ initial .ChannelName }}
+              </span>
+              {{ if .ChannelID }}
+              <img src="/channels/{{ .ChannelID }}/icon" alt="{{ .ChannelName }}" loading="lazy" onerror="this.hidden = true">
+              {{ end }}
+            </div>
+
+            <div class="video-details">
+              <h3 class="video-title">{{ .Title }}</h3>
+              <p class="video-meta">
+                <span class="video-channel">{{ .ChannelName }}</span>
+                <span class="video-meta-dot">•</span>
+                <time datetime="{{ .PublishedAt.Format "2006-01-02T15:04:05Z07:00" }}">
+                  {{ ago .PublishedAt }}
+                </time>
+                {{ if .Watched }}
+                <span class="video-meta-dot">•</span>
+                <span class="watched-indicator" aria-label="Watched" title="Watched">
+                  <i class="icon icon-check" aria-hidden="true"></i>
+                </span>
+                {{ end }}
+              </p>
+            </div>
+          </figcaption>
+        </figure>
+      </article>
+    </a>
+{{ end }}
+
+{{ define "video-channel-avatar" }}
+          <div class="video-channel-avatar">
+            <span class="video-avatar-fallback">
+              {{ initial .Title }}
+            </span>
+            {{ if .IconURL }}
+            <img src="/channels/{{ .ChannelID }}/icon" alt="{{ .Title }}" loading="lazy" onerror="this.hidden = true">
+            {{ end }}
+          </div>
+{{ end }}
+
+{{ define "pagination" }}
+      {{ if or .HasPrev .HasNext }}
+      <nav class="pagination" aria-label="Pagination">
+        {{ if .HasPrev }}
+        <a href="{{ .PrevPageURL }}" class="page-btn page-btn-prev">
+          <span aria-hidden="true">←</span>
+          <span>Previous</span>
+        </a>
+        {{ else }}
+        <span class="page-btn page-btn-disabled">
+          <span aria-hidden="true">←</span>
+          <span>Previous</span>
+        </span>
+        {{ end }}
+
+        <span class="page-indicator">Page {{ .Page }}</span>
+
+        {{ if .HasNext }}
+        <a href="{{ .NextPageURL }}" class="page-btn page-btn-next">
+          <span>Next</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        {{ else }}
+        <span class="page-btn page-btn-disabled">
+          <span>Next</span>
+          <span aria-hidden="true">→</span>
+        </span>
+        {{ end }}
+      </nav>
+      {{ end }}
+{{ end }}

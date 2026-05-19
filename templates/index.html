@@ -1,0 +1,39 @@
+{{ define "index.html" }}
+{{ template "layout-start" . }}
+
+      <header class="section-header">
+        {{ if .SelectedChannelTitle }}
+        <div>
+          <h2>{{ .SelectedChannelTitle }}</h2>
+          <p class="page-subtitle">Latest videos from this channel</p>
+        </div>
+        {{ else }}
+        <h2>Latest videos</h2>
+        {{ end }}
+      </header>
+
+      {{ if not .Videos }}
+      <section class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <i class="icon icon-play-circle"></i>
+        </div>
+
+        <div class="empty-copy">
+          <h2>No videos yet</h2>
+          <p>Add some channels to get started.</p>
+        </div>
+
+        <a href="/channels" class="primary-btn empty-action">Manage channels</a>
+      </section>
+      {{ else }}
+      <section class="video-grid" aria-label="Videos">
+        {{ range .Videos }}
+          {{ template "video-card" . }}
+        {{ end }}
+      </section>
+
+      {{ template "pagination" . }}
+      {{ end }}
+
+{{ template "layout-end" . }}
+{{ end }}

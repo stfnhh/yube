@@ -1,0 +1,39 @@
+{{ define "search.html" }}
+{{ template "layout-start" . }}
+
+      <header class="section-header">
+        <div>
+          <h2>Search results</h2>
+          {{ if .Search }}
+          <p class="page-subtitle">Results for “{{ .Search }}”</p>
+          {{ end }}
+        </div>
+      </header>
+
+      {{ if and (not .Videos) (not .ChannelResults) }}
+      <section class="empty-state">
+        <div class="empty-icon" aria-hidden="true">
+          <i class="icon icon-list"></i>
+        </div>
+
+        <div class="empty-copy">
+          <h2>No results found</h2>
+          <p>Try another search.</p>
+        </div>
+      </section>
+      {{ else }}
+      <section class="video-grid" aria-label="Search results">
+        {{ range .ChannelResults }}
+          {{ template "channel-result-card" . }}
+        {{ end }}
+
+        {{ range .Videos }}
+          {{ template "video-card" . }}
+        {{ end }}
+      </section>
+
+      {{ template "pagination" . }}
+      {{ end }}
+
+{{ template "layout-end" . }}
+{{ end }}

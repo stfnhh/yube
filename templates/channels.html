@@ -1,0 +1,101 @@
+{{ define "channels.html" }}
+{{ template "layout-start" . }}
+
+      <header class="section-header">
+        <div>
+          <h2>Channels</h2>
+          <p class="page-subtitle">Manage the channels in your TubeHive library.</p>
+        </div>
+      </header>
+
+      <section class="import-layout" aria-label="Channel management">
+        <section class="table-card" aria-labelledby="channels-title">
+
+          <table class="channel-table">
+            <thead>
+              <tr>
+                <th scope="col">Channel</th>
+                <th class="count-column" scope="col">Unwatched</th>
+                <th class="actions-column" scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{ range .ChannelFeeds }}
+              <tr>
+                <td>
+                  <a class="channel-cell" href="/channels/{{ .ChannelID }}">
+                    <span class="sub-avatar">
+                      <span class="sub-avatar-fallback">{{ initial .Title }}</span>
+                      {{ if .IconURL }}
+                      <img
+                        src="/channels/{{ .ChannelID }}/icon"
+                        alt="{{ .Title }}"
+                        loading="lazy"
+                        onerror="this.hidden = true"
+                      >
+                      {{ end }}
+                    </span>
+                    <span class="channel-name">{{ .Title }}</span>
+                  </a>
+                </td>
+                <td class="count-column">{{ .UnreadCount }}</td>
+                <td class="actions-column">
+                  <button class="unsubscribe-btn" type="button" data-delete-url="/channels/{{ .ChannelID }}" data-channel-title="{{ .Title }}">
+                    Unsubscribe
+                  </button>
+                </td>
+              </tr>
+              {{ else }}
+              <tr>
+                <td colspan="5">No channels yet.</td>
+              </tr>
+              {{ end }}
+            </tbody>
+          </table>
+        </section>
+
+        <section class="channel-actions-grid" aria-label="Add channels">
+          <article class="import-card">
+            <header class="settings-card-header">
+              <div>
+                <h3>Add channel</h3>
+                <p>Add a channel by URL or subscription feed.</p>
+              </div>
+            </header>
+
+            <form class="channel-form channel-action-form" action="/channels" method="post">
+              <div class="channel-input-panel">
+                <label class="channel-input-title" for="feed-url">Channel source</label>
+                <span class="channel-input-copy">Paste a channel URL, handle URL, or subscription feed.</span>
+                <input id="feed-url" name="feed_url" placeholder="https://.../@channel" required>
+              </div>
+              <button class="primary-btn action-fit-btn" type="submit">Add channel</button>
+            </form>
+          </article>
+
+          <article class="import-card">
+            <header class="settings-card-header">
+              <div>
+                <h3>Import subscriptions</h3>
+                <p>Use an OPML subscription export.</p>
+              </div>
+            </header>
+
+            <form class="upload-zone compact-upload-zone channel-action-form" action="/channels/import" method="post" enctype="multipart/form-data">
+              <label class="upload-drop-target" for="opml" tabindex="0">
+                <span class="upload-icon">
+                  <i class="icon icon-download-cloud" aria-hidden="true"></i>
+                </span>
+                <span class="upload-title">Drop OPML file here</span>
+                <span class="upload-subtitle">or click to choose .opml or .xml</span>
+                <span class="upload-file-name" data-file-name>No file selected</span>
+              </label>
+              <input id="opml" class="file-input" type="file" name="opml" accept=".opml,.xml">
+              <button class="primary-btn" type="submit">Import channels</button>
+            </form>
+          </article>
+        </section>
+      </section>
+
+{{ template "layout-end" . }}
+{{ end }}

@@ -1,0 +1,8 @@
+.git
+data
+tmp
+bin
+node_modules
+*.db
+*.sqlite
+.DS_Store
