@@ -12,6 +12,20 @@ func (s *Server) render(
 	name string,
 	data PageData,
 ) {
+	s.renderWithStatus(
+		w,
+		name,
+		data,
+		http.StatusOK,
+	)
+}
+
+func (s *Server) renderWithStatus(
+	w http.ResponseWriter,
+	name string,
+	data PageData,
+	status int,
+) {
 	var buf bytes.Buffer
 
 	err := s.Templates.ExecuteTemplate(
@@ -34,7 +48,7 @@ func (s *Server) render(
 		"text/html; charset=utf-8",
 	)
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(status)
 
 	_, _ = buf.WriteTo(w)
 }
@@ -63,6 +77,35 @@ func (s *Server) renderPage(
 		w,
 		name,
 		data,
+	)
+}
+
+func (s *Server) renderPageWithStatus(
+	w http.ResponseWriter,
+	r *http.Request,
+	name string,
+	data PageData,
+	status int,
+) {
+	data, err := s.sharedPageData(
+		r,
+		data,
+	)
+	if err != nil {
+		http.Error(
+			w,
+			err.Error(),
+			http.StatusInternalServerError,
+		)
+
+		return
+	}
+
+	s.renderWithStatus(
+		w,
+		name,
+		data,
+		status,
 	)
 }
 

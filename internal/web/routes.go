@@ -51,5 +51,7 @@ func (s *Server) Routes() http.Handler {
 
 	r.Post("/refresh", s.refresh)
 
+	r.NotFound(s.notFound)
+
 	return r
 }

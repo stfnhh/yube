@@ -8,16 +8,16 @@ import (
 	"os/signal"
 	"time"
 
-	"tubehive/internal/db"
-	"tubehive/internal/feed"
-	"tubehive/internal/web"
+	"yube/internal/db"
+	"yube/internal/feed"
+	"yube/internal/web"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	dbPath := getenv("DB_PATH", "tubehive.db")
+	dbPath := getenv("DB_PATH", "yube.db")
 	addr := getenv("ADDR", ":8080")
 
 	store, err := db.Open(dbPath)

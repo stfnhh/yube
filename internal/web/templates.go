@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"tubehive/internal/db"
-	"tubehive/internal/feed"
+	"yube/internal/db"
+	"yube/internal/feed"
 )
 
 func New(

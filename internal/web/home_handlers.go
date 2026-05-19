@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"tubehive/internal/db"
+	"yube/internal/db"
 )
 
 func (s *Server) index(
@@ -71,7 +71,7 @@ func (s *Server) index(
 		w,
 		r,
 		PageData{
-			Title: "TubeDeck",
+			Title: "Yubè",
 
 			Videos: videos,
 
@@ -158,7 +158,7 @@ func (s *Server) search(
 		r,
 		"search.html",
 		PageData{
-			Title: "Search · TubeHive",
+			Title: "Search · Yubè",
 
 			Videos:         videos,
 			ChannelResults: channelResults,

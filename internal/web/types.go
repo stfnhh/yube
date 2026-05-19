@@ -4,8 +4,8 @@ import (
 	"html/template"
 	"time"
 
-	"tubehive/internal/db"
-	"tubehive/internal/feed"
+	"yube/internal/db"
+	"yube/internal/feed"
 )
 
 type Server struct {

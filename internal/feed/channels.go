@@ -14,7 +14,7 @@ import (
 
 	"github.com/mmcdole/gofeed"
 
-	"tubehive/internal/db"
+	"yube/internal/db"
 )
 
 var channelIconRegex = regexp.MustCompile(
@@ -427,7 +427,7 @@ func (r *Refresher) RefreshFeed(
 
 	req.Header.Set(
 		"User-Agent",
-		"TubeHive/0.1",
+		"Yube/0.1",
 	)
 
 	if f.ETag.Valid {

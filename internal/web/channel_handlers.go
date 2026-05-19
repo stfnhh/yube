@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"tubehive/internal/feed"
-	"tubehive/internal/opml"
+	"yube/internal/feed"
+	"yube/internal/opml"
 )
 
 func (s *Server) channels(
@@ -29,7 +29,7 @@ func (s *Server) channels(
 	}
 
 	data := PageData{
-		Title: "Channels · TubeHive",
+		Title: "Channels · Yubè",
 
 		ChannelFeeds: feeds,
 	}
@@ -221,6 +221,18 @@ func (s *Server) refresh(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	if err := s.Store.TouchRefreshTime(
+		r.Context(),
+	); err != nil {
+		http.Error(
+			w,
+			err.Error(),
+			http.StatusInternalServerError,
+		)
+
+		return
+	}
+
 	go s.Refresher.RefreshAll(
 		context.Background(),
 	)

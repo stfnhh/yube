@@ -1,6 +1,6 @@
 const themeIcons = {
-  dark: '<i class="icon icon-moon" aria-hidden="true"></i>',
-  light: '<i class="icon icon-sun" aria-hidden="true"></i>',
+  dark: '<i class="icon icon-sun" aria-hidden="true"></i>',
+  light: '<i class="icon icon-moon" aria-hidden="true"></i>',
 };
 
 initThemeToggle();
@@ -208,13 +208,18 @@ function initUploadZones() {
     const input = zone.querySelector('input[type="file"]');
     const target = zone.querySelector(".upload-drop-target");
     const fileName = zone.querySelector("[data-file-name]");
+    const submitButton = zone.querySelector('button[type="submit"]');
 
     if (!input || !target) {
       return;
     }
 
     input.addEventListener("change", () => {
-      updateSelectedFileName(input, fileName);
+      updateSelectedFileName(input, fileName, submitButton);
+    });
+
+    target.addEventListener("click", () => {
+      input.click();
     });
 
     zone.addEventListener("submit", (event) => {
@@ -223,16 +228,7 @@ function initUploadZones() {
       }
 
       event.preventDefault();
-      input.click();
-    });
-
-    target.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") {
-        return;
-      }
-
-      event.preventDefault();
-      input.click();
+      target.focus();
     });
 
     ["dragenter", "dragover"].forEach((eventName) => {
@@ -256,19 +252,25 @@ function initUploadZones() {
       }
 
       input.files = event.dataTransfer.files;
-      updateSelectedFileName(input, fileName);
+      updateSelectedFileName(input, fileName, submitButton);
     });
+
+    updateSelectedFileName(input, fileName, submitButton);
   });
 }
 
-function updateSelectedFileName(input, fileName) {
-  if (!fileName) {
-    return;
+function updateSelectedFileName(input, fileName, submitButton) {
+  const hasFile = input.files.length > 0;
+
+  if (fileName) {
+    fileName.textContent = hasFile
+      ? input.files[0].name
+      : "No file selected";
   }
 
-  fileName.textContent = input.files.length > 0
-    ? input.files[0].name
-    : "No file selected";
+  if (submitButton) {
+    submitButton.disabled = !hasFile;
+  }
 }
 
 function getImageAverageColor(image) {

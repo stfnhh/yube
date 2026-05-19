@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"tubehive/internal/db"
+	"yube/internal/db"
 )
 
 func (s *Server) settings(
@@ -25,7 +25,7 @@ func (s *Server) settings(
 	}
 
 	data := PageData{
-		Title:    "Settings · TubeHive",
+		Title:    "Settings · Yubè",
 		Settings: settings,
 		Message:  strings.TrimSpace(r.URL.Query().Get("message")),
 	}

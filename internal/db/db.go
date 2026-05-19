@@ -74,11 +74,12 @@ type Video struct {
 type Settings struct {
 	bun.BaseModel `bun:"table:settings,alias:s"`
 
-	ID                  int64     `bun:"id,pk"`
-	RefreshIntervalMin  int       `bun:"refresh_interval_minutes,notnull"`
-	VideoRetentionDays  int       `bun:"video_retention_days,notnull"`
-	MaxVideosPerChannel int       `bun:"max_videos_per_channel,notnull"`
-	UpdatedAt           time.Time `bun:"updated_at,notnull,default:CURRENT_TIMESTAMP"`
+	ID                  int64        `bun:"id,pk"`
+	RefreshIntervalMin  int          `bun:"refresh_interval_minutes,notnull"`
+	VideoRetentionDays  int          `bun:"video_retention_days,notnull"`
+	MaxVideosPerChannel int          `bun:"max_videos_per_channel,notnull"`
+	LastRefreshedAt     sql.NullTime `bun:"last_refreshed_at"`
+	UpdatedAt           time.Time    `bun:"updated_at,notnull,default:CURRENT_TIMESTAMP"`
 }
 
 type videoRow struct {
@@ -100,6 +101,11 @@ type videoRow struct {
 type Store struct {
 	DB *bun.DB
 }
+
+const (
+	videoHost     = "www.youtube.com"
+	thumbnailHost = "i.ytimg.com"
+)
 
 func Open(path string) (*Store, error) {
 	database, err := sql.Open(
@@ -164,23 +170,6 @@ func (s *Store) Migrate(ctx context.Context) error {
 		Exec(ctx); err != nil {
 		return err
 	}
-
-	_, _ = s.DB.NewAddColumn().
-		Model((*Feed)(nil)).
-		ColumnExpr("icon_url TEXT NOT NULL DEFAULT ''").
-		Exec(ctx)
-
-	_, _ = s.DB.NewAddColumn().
-		Model((*Video)(nil)).
-		ColumnExpr("watched INTEGER NOT NULL DEFAULT 0").
-		Exec(ctx)
-
-	_, _ = s.DB.NewUpdate().
-		Model((*Video)(nil)).
-		Set("video_url = ?", "").
-		Set("thumbnail_url = ?", "").
-		Where("video_url != '' OR thumbnail_url != ''").
-		Exec(ctx)
 
 	settings := DefaultSettings()
 
@@ -480,16 +469,43 @@ func (s *Store) LastRefreshTime(ctx context.Context) (time.Time, bool, error) {
 		return time.Time{}, false, err
 	}
 
-	if !lastCheckedAt.Valid {
-		return time.Time{}, false, nil
-	}
-
-	updatedAt, err := parseDBTime(lastCheckedAt.String)
+	lastUpdated, ok, err := parseOptionalDBTime(lastCheckedAt)
 	if err != nil {
 		return time.Time{}, false, err
 	}
 
-	return updatedAt, !updatedAt.IsZero(), nil
+	var lastRefreshedAt sql.NullString
+
+	err = s.DB.NewSelect().
+		Model((*Settings)(nil)).
+		Column("last_refreshed_at").
+		Where("id = ?", 1).
+		Scan(ctx, &lastRefreshedAt)
+	if err != nil {
+		return time.Time{}, false, err
+	}
+
+	refreshedAt, refreshedOK, err := parseOptionalDBTime(lastRefreshedAt)
+	if err != nil {
+		return time.Time{}, false, err
+	}
+
+	if refreshedOK &&
+		(!ok || refreshedAt.After(lastUpdated)) {
+		return refreshedAt, true, nil
+	}
+
+	return lastUpdated, ok, nil
+}
+
+func (s *Store) TouchRefreshTime(ctx context.Context) error {
+	_, err := s.DB.NewUpdate().
+		Model((*Settings)(nil)).
+		Set("last_refreshed_at = CURRENT_TIMESTAMP").
+		Where("id = ?", 1).
+		Exec(ctx)
+
+	return err
 }
 
 func (s *Store) SaveFeedFetch(
@@ -819,6 +835,19 @@ func parseDBTime(value string) (time.Time, error) {
 	return time.Time{}, parseErr
 }
 
+func parseOptionalDBTime(value sql.NullString) (time.Time, bool, error) {
+	if !value.Valid {
+		return time.Time{}, false, nil
+	}
+
+	parsed, err := parseDBTime(value.String)
+	if err != nil {
+		return time.Time{}, false, err
+	}
+
+	return parsed, !parsed.IsZero(), nil
+}
+
 func (row videoRow) Video() Video {
 	return Video{
 		ID:           row.ID,
@@ -838,7 +867,7 @@ func (row videoRow) Video() Video {
 func WatchVideoURL(videoID string) string {
 	return fmt.Sprintf(
 		"https://%s/watch?v=%s",
-		videoHost(),
+		videoHost,
 		videoID,
 	)
 }
@@ -846,7 +875,7 @@ func WatchVideoURL(videoID string) string {
 func ThumbnailURL(videoID string) string {
 	return fmt.Sprintf(
 		"https://%s/vi/%s/hqdefault.jpg",
-		thumbnailHost(),
+		thumbnailHost,
 		videoID,
 	)
 }
@@ -854,15 +883,7 @@ func ThumbnailURL(videoID string) string {
 func ChannelFeedURL(channelID string) string {
 	return fmt.Sprintf(
 		"https://%s/feeds/videos.xml?channel_id=%s",
-		videoHost(),
+		videoHost,
 		channelID,
 	)
-}
-
-func videoHost() string {
-	return "www.you" + "tube.com"
-}
-
-func thumbnailHost() string {
-	return "i.yt" + "img.com"
 }

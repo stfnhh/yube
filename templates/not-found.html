@@ -1,0 +1,19 @@
+{{ define "not-found.html" }}
+{{ template "layout-start" . }}
+
+      <section class="empty-state not-found-state">
+        <div class="empty-icon" aria-hidden="true">
+          <i class="icon icon-search"></i>
+        </div>
+
+        <div class="empty-copy">
+          <p class="error-code">404</p>
+          <h2>Page not found</h2>
+          <p>The page may have moved, or the address may be wrong.</p>
+        </div>
+
+        <a href="/" class="primary-btn empty-action">Back to watch</a>
+      </section>
+
+{{ template "layout-end" . }}
+{{ end }}

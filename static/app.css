@@ -7,11 +7,11 @@
 }
 
 @font-face {
-  font-family: "TubeHive Icons";
+  font-family: "Yube Icons";
   font-style: normal;
   font-weight: normal;
   font-display: block;
-  src: url("/static/fonts/tubehive-icons.woff2") format("woff2");
+  src: url("/static/fonts/yube-icons.woff2") format("woff2");
 }
 
 :root {
@@ -26,7 +26,7 @@
   --color-surface-subtle: #fcfcfd;
   --color-surface-muted: #f3f4f6;
   --color-surface-hover: #f9fafb;
-  --color-nav-hover: #f7f7f8;
+  --color-action-hover: var(--color-accent-weak);
 
   --color-border: #e9eaee;
   --color-border-muted: #ececec;
@@ -41,9 +41,10 @@
   /* Brand accent */
   --color-accent: #4b88c3;
   --color-accent-soft: #dcebf8;
-  --color-accent-weak: #f4f8fc;
+  --color-accent-weak: #eaf4fb;
   --color-accent-strong: #356a9d;
   --color-accent-text: #28527a;
+  --color-accent-contrast: #ffffff;
 
   --color-accent-border: rgba(75, 136, 195, 0.36);
   --color-accent-tint: rgba(75, 136, 195, 0.1);
@@ -67,6 +68,9 @@
 
   --color-count-inverse-bg: rgba(0, 0, 0, 0.18);
   --color-count-inverse-text: rgba(255, 255, 255, 0.92);
+  --color-disabled-surface: #eef1f5;
+  --color-disabled-text: #8b95a3;
+  --color-disabled-border: #e1e6ec;
 
   --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.04);
   --shadow-hover: 0 12px 28px rgba(17, 24, 39, 0.08);
@@ -119,7 +123,7 @@ body.dark {
   --color-surface-muted: var(--color-overlay-muted);
   --color-surface-hover: var(--color-overlay-hover);
 
-  --color-nav-hover: var(--color-overlay-muted);
+  --color-action-hover: var(--color-accent-weak);
 
   --color-border: var(--color-overlay-border);
   --color-border-muted: var(--color-overlay-border);
@@ -127,15 +131,19 @@ body.dark {
   --color-border-strong: #e5e7eb;
 
   --color-text: #ffffff;
-  --color-text-muted: #9ca3af;
-  --color-text-subtle: #9ca3af;
+  --color-text-muted: #a8b3c2;
+  --color-text-subtle: #8f9aaa;
   --color-text-soft: #e5e7eb;
 
   /* Brand accent */
   --color-accent-soft: rgba(75, 136, 195, 0.16);
-  --color-accent-weak: rgba(75, 136, 195, 0.05);
+  --color-accent-weak: rgba(75, 136, 195, 0.09);
   --color-accent-text: #d8ebff;
+  --color-accent-contrast: #ffffff;
   --color-accent-border: rgba(75, 136, 195, 0.28);
+  --color-disabled-surface: rgba(255, 255, 255, 0.045);
+  --color-disabled-text: #6f7b8a;
+  --color-disabled-border: rgba(255, 255, 255, 0.07);
 
   --color-focus-ring: rgba(75, 136, 195, 0.42);
   --color-focus-ring-strong: rgba(75, 136, 195, 0.68);
@@ -301,7 +309,8 @@ SIDEBAR
 }
 
 .nav-item:hover {
-  background: var(--color-nav-hover);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 .nav-item.active {
@@ -363,7 +372,8 @@ SIDEBAR
 }
 
 .sub-item:hover {
-  background: var(--color-nav-hover);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 .sub-item.active {
@@ -640,7 +650,9 @@ MAIN CONTENT
 }
 
 .ghost-btn:hover {
-  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 .icon-btn {
@@ -661,6 +673,20 @@ MAIN CONTENT
 
   font-size: 18px;
   line-height: 1;
+
+  transition: var(--transition-fast);
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  border-color: var(--color-accent-border);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--color-focus-ring-strong);
+  outline-offset: 2px;
 }
 
 .icon-btn .icon {
@@ -733,6 +759,16 @@ EMPTY STATE
 
   font-size: 24px;
   font-weight: 700;
+}
+
+.error-code {
+  margin-bottom: 6px;
+
+  color: var(--color-accent-strong);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .empty-copy p {
@@ -1012,11 +1048,16 @@ PAGINATION
 }
 
 .page-btn:hover {
-  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 .page-btn-disabled {
-  opacity: 0.38;
+  border-color: var(--color-disabled-border);
+  background: var(--color-disabled-surface);
+  color: var(--color-disabled-text);
+  opacity: 1;
   cursor: default;
   pointer-events: none;
 }
@@ -1045,9 +1086,10 @@ BUTTONS
   border-radius: var(--radius-md);
 
   background: var(--color-accent);
-  color: var(--color-text);
+  color: var(--color-accent-contrast);
 
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
 
   cursor: pointer;
 
@@ -1055,8 +1097,15 @@ BUTTONS
 }
 
 .primary-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-accent);
+  background: var(--color-accent-strong);
+}
+
+.primary-btn:disabled {
+  cursor: not-allowed;
+  border: 1px solid var(--color-disabled-border);
+  background: var(--color-disabled-surface);
+  color: var(--color-disabled-text);
+  opacity: 1;
 }
 
 .action-fit-btn {
@@ -1259,7 +1308,10 @@ TABLE CARD
 
 .unsubscribe-btn:disabled {
   cursor: default;
-  opacity: 0.6;
+  border-color: var(--color-disabled-border);
+  background: var(--color-disabled-surface);
+  color: var(--color-disabled-text);
+  opacity: 1;
 }
 
 .compact-upload-zone {
@@ -1362,6 +1414,7 @@ IMPORT PAGE
   text-align: center;
   cursor: pointer;
   outline: none;
+  font: inherit;
 }
 
 .upload-drop-target:focus-visible {
@@ -1577,7 +1630,8 @@ body.dark .settings-card-header p {
 
 body.dark .nav-item:hover,
 body.dark .sub-item:hover {
-  background: var(--color-nav-hover);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 body.dark .nav-item.active,
@@ -1599,6 +1653,13 @@ body.dark .empty-state {
   background: var(--color-surface);
   border-color: var(--color-border);
   color: var(--color-text);
+}
+
+body.dark .topbar-actions .icon-btn:hover,
+body.dark .topbar-actions .icon-btn:focus-visible {
+  border-color: var(--color-accent-border);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 body.dark .video-card {
@@ -1625,12 +1686,15 @@ body.dark .setting-row select {
 }
 
 body.dark .unsubscribe-btn:hover {
-  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+  background: var(--color-action-hover);
   color: var(--color-accent-text);
 }
 
 body.dark .page-btn:hover {
-  background: var(--color-surface-hover);
+  border-color: var(--color-accent-border);
+  background: var(--color-action-hover);
+  color: var(--color-accent-text);
 }
 
 body.dark .notice {
@@ -1989,7 +2053,7 @@ ICONS
 ========================================================= */
 
 .icon::before {
-  font-family: "TubeHive Icons";
+  font-family: "Yube Icons";
   font-style: normal;
   font-weight: normal;
   speak: never;
@@ -2009,6 +2073,7 @@ ICONS
 .icon-cog::before { content: "\e041"; }
 .icon-list::before { content: "\e088"; }
 .icon-search::before { content: "\e08f"; }
+.icon-menu::before { content: "\e09b"; }
 .icon-moon::before { content: "\e09f"; }
 .icon-play-circle::before { content: "\e0a9"; }
 .icon-reload::before { content: "\e0b3"; }

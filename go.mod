@@ -1,4 +1,4 @@
-module tubehive
+module yube
 
 go 1.25.0
 

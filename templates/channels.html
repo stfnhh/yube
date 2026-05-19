@@ -4,7 +4,7 @@
       <header class="section-header">
         <div>
           <h2>Channels</h2>
-          <p class="page-subtitle">Manage the channels in your TubeHive library.</p>
+          <p class="page-subtitle">Manage the channels in your library.</p>
         </div>
       </header>
 
@@ -82,16 +82,16 @@
             </header>
 
             <form class="upload-zone compact-upload-zone channel-action-form" action="/channels/import" method="post" enctype="multipart/form-data">
-              <label class="upload-drop-target" for="opml" tabindex="0">
+              <button class="upload-drop-target" type="button">
                 <span class="upload-icon">
                   <i class="icon icon-download-cloud" aria-hidden="true"></i>
                 </span>
                 <span class="upload-title">Drop OPML file here</span>
                 <span class="upload-subtitle">or click to choose .opml or .xml</span>
                 <span class="upload-file-name" data-file-name>No file selected</span>
-              </label>
+              </button>
               <input id="opml" class="file-input" type="file" name="opml" accept=".opml,.xml">
-              <button class="primary-btn" type="submit">Import channels</button>
+              <button class="primary-btn" type="submit" disabled>Import channels</button>
             </form>
           </article>
         </section>
