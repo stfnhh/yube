@@ -5,6 +5,7 @@ import (
 	"errors"
 	"html"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -46,6 +47,7 @@ type Refresher struct {
 	Concurrency int
 
 	mu              sync.RWMutex
+	running         bool
 	settingsChanged chan struct{}
 }
 
@@ -307,7 +309,16 @@ func (r *Refresher) FetchChannelIcon(
 }
 
 func (r *Refresher) Start(ctx context.Context) {
+	r.mu.Lock()
+	r.running = true
+	r.mu.Unlock()
+
 	go func() {
+		log.Printf(
+			"feed processor started interval=%s concurrency=%d",
+			r.refreshInterval(),
+			r.Concurrency,
+		)
 
 		r.RefreshDue(ctx)
 
@@ -319,13 +330,16 @@ func (r *Refresher) Start(ctx context.Context) {
 			select {
 
 			case <-ctx.Done():
+				log.Printf("feed processor stopped")
 				return
 
 			case <-ticker.C:
+				log.Printf("feed processor tick interval=%s", r.refreshInterval())
 				r.RefreshDue(ctx)
 				ticker.Reset(r.refreshInterval())
 
 			case <-r.settingsChanged:
+				log.Printf("feed processor settings changed interval=%s", r.refreshInterval())
 				ticker.Reset(r.refreshInterval())
 			}
 		}
@@ -335,15 +349,18 @@ func (r *Refresher) Start(ctx context.Context) {
 func (r *Refresher) RefreshDue(
 	ctx context.Context,
 ) {
+	interval := r.refreshInterval()
 
 	feeds, err := r.Store.FeedsDue(
 		ctx,
-		r.refreshInterval(),
+		interval,
 	)
 	if err != nil {
+		log.Printf("feed processor due lookup failed interval=%s error=%v", interval, err)
 		return
 	}
 
+	log.Printf("feed processor due run feeds=%d interval=%s", len(feeds), interval)
 	r.RefreshFeeds(ctx, feeds)
 }
 
@@ -353,9 +370,11 @@ func (r *Refresher) RefreshAll(
 
 	feeds, err := r.Store.ListFeeds(ctx)
 	if err != nil {
+		log.Printf("feed processor full run lookup failed error=%v", err)
 		return
 	}
 
+	log.Printf("feed processor full run feeds=%d", len(feeds))
 	r.RefreshFeeds(ctx, feeds)
 }
 
@@ -363,10 +382,17 @@ func (r *Refresher) RefreshFeeds(
 	ctx context.Context,
 	feeds []db.Feed,
 ) {
+	started := time.Now()
 
 	if r.Concurrency < 1 {
 		r.Concurrency = 1
 	}
+
+	log.Printf(
+		"feed refresh batch started feeds=%d concurrency=%d",
+		len(feeds),
+		r.Concurrency,
+	)
 
 	sem := make(
 		chan struct{},
@@ -397,10 +423,20 @@ func (r *Refresher) RefreshFeeds(
 				<-sem
 			}()
 
-			_ = r.RefreshFeed(
+			started := time.Now()
+			err := r.RefreshFeed(
 				ctx,
 				feed,
 			)
+			if err != nil {
+				log.Printf(
+					"channel refresh failed channel_id=%s title=%q duration=%s error=%v",
+					feed.ChannelID,
+					feed.Title,
+					time.Since(started).Round(time.Millisecond),
+					err,
+				)
+			}
 
 		}(f)
 	}
@@ -408,6 +444,12 @@ func (r *Refresher) RefreshFeeds(
 	wg.Wait()
 
 	r.cleanupVideos(ctx)
+
+	log.Printf(
+		"feed refresh batch finished feeds=%d duration=%s",
+		len(feeds),
+		time.Since(started).Round(time.Millisecond),
+	)
 }
 
 func (r *Refresher) RefreshFeed(
@@ -461,6 +503,12 @@ func (r *Refresher) RefreshFeed(
 
 	if resp.StatusCode ==
 		http.StatusNotModified {
+		log.Printf(
+			"channel refresh skipped channel_id=%s title=%q status=%d",
+			f.ChannelID,
+			f.Title,
+			resp.StatusCode,
+		)
 
 		return r.Store.SaveFeedFetch(
 			ctx,
@@ -493,6 +541,15 @@ func (r *Refresher) RefreshFeed(
 	if err != nil {
 		return err
 	}
+
+	log.Printf(
+		"channel refresh fetched channel_id=%s title=%q status=%d items=%d bytes=%d",
+		f.ChannelID,
+		parsed.Title,
+		resp.StatusCode,
+		len(parsed.Items),
+		len(body),
+	)
 
 	iconURL := f.IconURL
 
@@ -624,12 +681,24 @@ func (r *Refresher) ApplySettings(settings db.Settings) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
+	oldInterval := r.Interval
 	r.Interval = time.Duration(settings.RefreshIntervalMin) *
 		time.Minute
+	running := r.running
+	intervalChanged := oldInterval != r.Interval
 
-	select {
-	case r.settingsChanged <- struct{}{}:
-	default:
+	log.Printf(
+		"feed processor settings applied refresh_interval=%s retention_days=%d max_videos_per_channel=%d",
+		r.Interval,
+		settings.VideoRetentionDays,
+		settings.MaxVideosPerChannel,
+	)
+
+	if running && intervalChanged {
+		select {
+		case r.settingsChanged <- struct{}{}:
+		default:
+		}
 	}
 }
 
@@ -647,13 +716,28 @@ func (r *Refresher) refreshInterval() time.Duration {
 func (r *Refresher) cleanupVideos(ctx context.Context) {
 	settings, err := r.Store.GetSettings(ctx)
 	if err != nil {
+		log.Printf("video cleanup settings lookup failed error=%v", err)
 		return
 	}
 
 	settings = db.NormalizeSettings(settings)
 
-	_ = r.Store.CleanupVideos(
+	if err := r.Store.CleanupVideos(
 		ctx,
+		settings.VideoRetentionDays,
+		settings.MaxVideosPerChannel,
+	); err != nil {
+		log.Printf(
+			"video cleanup failed retention_days=%d max_videos_per_channel=%d error=%v",
+			settings.VideoRetentionDays,
+			settings.MaxVideosPerChannel,
+			err,
+		)
+		return
+	}
+
+	log.Printf(
+		"video cleanup finished retention_days=%d max_videos_per_channel=%d",
 		settings.VideoRetentionDays,
 		settings.MaxVideosPerChannel,
 	)

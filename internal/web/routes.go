@@ -8,6 +8,7 @@ import (
 
 func (s *Server) Routes() http.Handler {
 	r := chi.NewRouter()
+	r.Use(requestLogger)
 
 	r.Handle(
 		"/static/*",

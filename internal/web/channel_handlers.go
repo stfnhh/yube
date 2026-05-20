@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"strings"
 
@@ -65,6 +66,7 @@ func (s *Server) addChannel(
 		rawURL,
 	)
 	if err != nil {
+		log.Printf("add channel failed source=%q remote=%s error=%v", rawURL, clientIP(r), err)
 		http.Error(
 			w,
 			"Expected a channel URL or Atom source URL",
@@ -81,6 +83,7 @@ func (s *Server) addChannel(
 		channel.FeedURL,
 		channel.IconURL,
 	); err != nil {
+		log.Printf("add channel store failed channel_id=%s title=%q remote=%s error=%v", channel.ChannelID, channel.Title, clientIP(r), err)
 		http.Error(
 			w,
 			err.Error(),
@@ -89,6 +92,8 @@ func (s *Server) addChannel(
 
 		return
 	}
+
+	log.Printf("channel added channel_id=%s title=%q remote=%s", channel.ChannelID, channel.Title, clientIP(r))
 
 	go s.Refresher.RefreshAll(
 		context.Background(),
@@ -133,6 +138,7 @@ func (s *Server) importOPML(
 
 	feeds, err := opml.Parse(file)
 	if err != nil {
+		log.Printf("import subscriptions parse failed remote=%s error=%v", clientIP(r), err)
 		http.Error(
 			w,
 			err.Error(),
@@ -142,11 +148,15 @@ func (s *Server) importOPML(
 		return
 	}
 
+	imported := 0
+	skipped := 0
+
 	for _, item := range feeds {
 		if !strings.Contains(
 			item.URL,
 			feed.SubscriptionFeedPath(),
 		) {
+			skipped++
 			continue
 		}
 
@@ -154,6 +164,7 @@ func (s *Server) importOPML(
 			item.URL,
 		)
 		if err != nil {
+			skipped++
 			continue
 		}
 
@@ -163,14 +174,22 @@ func (s *Server) importOPML(
 			title = channelID
 		}
 
-		_ = s.Store.UpsertFeed(
+		if err := s.Store.UpsertFeed(
 			r.Context(),
 			title,
 			channelID,
 			item.URL,
 			"",
-		)
+		); err != nil {
+			log.Printf("import subscription store failed channel_id=%s title=%q remote=%s error=%v", channelID, title, clientIP(r), err)
+			skipped++
+			continue
+		}
+
+		imported++
 	}
+
+	log.Printf("subscriptions imported imported=%d skipped=%d remote=%s", imported, skipped, clientIP(r))
 
 	go s.Refresher.RefreshAll(
 		context.Background(),
@@ -200,6 +219,7 @@ func (s *Server) unsubscribeChannel(
 		r.Context(),
 		channelID,
 	); err != nil {
+		log.Printf("unsubscribe channel failed channel_id=%s remote=%s error=%v", channelID, clientIP(r), err)
 		http.Error(
 			w,
 			err.Error(),
@@ -208,6 +228,8 @@ func (s *Server) unsubscribeChannel(
 
 		return
 	}
+
+	log.Printf("channel unsubscribed channel_id=%s remote=%s", channelID, clientIP(r))
 
 	http.Redirect(
 		w,
@@ -221,6 +243,8 @@ func (s *Server) refresh(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	log.Printf("manual refresh requested remote=%s", clientIP(r))
+
 	if err := s.Store.TouchRefreshTime(
 		r.Context(),
 	); err != nil {
