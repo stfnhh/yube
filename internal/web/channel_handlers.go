@@ -268,3 +268,37 @@ func (s *Server) refresh(
 		http.StatusSeeOther,
 	)
 }
+
+func (s *Server) exportOPML(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	feeds, err := s.Store.ListFeeds(r.Context())
+	if err != nil {
+		http.Error(
+			w,
+			err.Error(),
+			http.StatusInternalServerError,
+		)
+
+		return
+	}
+
+	exportFeeds := make([]opml.Feed, 0, len(feeds))
+	for _, feed := range feeds {
+		exportFeeds = append(exportFeeds, opml.Feed{
+			Title: feed.Title,
+			URL:   feed.FeedURL,
+		})
+	}
+
+	w.Header().Set("Content-Type", "text/x-opml; charset=utf-8")
+	w.Header().Set(
+		"Content-Disposition",
+		`attachment; filename="yube-channels.opml"`,
+	)
+
+	if err := opml.Write(w, "Yubè Channels", exportFeeds); err != nil {
+		return
+	}
+}

@@ -27,6 +27,7 @@ func (s *Server) Routes() http.Handler {
 	r.Get("/search", s.search)
 
 	r.Get("/settings", s.settings)
+	r.Get("/channels.opml", s.exportOPML)
 	r.Post("/settings", s.updateSettings)
 
 	r.Route("/channels", func(r chi.Router) {
